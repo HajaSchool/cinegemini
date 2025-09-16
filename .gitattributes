@@ -1,2 +1,30 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+#!/bin/bash
+
+# Inicia o backend em segundo plano
+echo "Iniciando o backæ₢end..."
+cd backend
+python app.py &
+BACKEND_PID=$!
+
+# Aguarda um pouco para o backend iniciar
+sleep 2
+
+# Inicia o frontend em segundo plano
+echo "Iniciando o frontend..."
+cd ../frontend
+npm run dev &
+FRONTEND_PID=$!
+
+# Função para encerrar os processos quando o script for interrompido
+cleanup() {
+  echo "\nEncerrando servidores..."
+  kill $BACKEND_PID $FRONTEND_PID 2>/dev/null
+  exit 0
+}
+
+# Captura o sinal de interrupção (Ctrl+C)
+trap cleanup SIGINT
+
+# Mantém o script rodando
+wait
+.
